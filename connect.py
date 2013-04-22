@@ -91,15 +91,15 @@ for deployment in svc.deployments:
         print "-------Role"
         print_stuff(role)
 
-deployment = service.get_deployment_by_slot(svc.service_name, "Production")
-print "-------Get Deployment"
-print_stuff(deployment)
-for role_inst in deployment.role_instance_list:
-    print "-------Role Instance"
-    print_stuff(role_inst)
-for role in deployment.role_list:
-    print "-------Role"
-    print_stuff(role)
+#deployment = service.get_deployment_by_slot(svc.service_name, "Production")
+#print "-------Get Deployment"
+#print_stuff(deployment)
+#for role_inst in deployment.role_instance_list:
+#    print "-------Role Instance"
+#    print_stuff(role_inst)
+#for role in deployment.role_list:
+#    print "-------Role"
+#    print_stuff(role)
 
 aff_grps = service.list_affinity_groups()
 print "-------List Affinity Groups"
@@ -107,13 +107,13 @@ for grp in aff_grps:
     print "-------Affinity Group"
     print_stuff(grp)
 
-aff_grp_prop = service.get_affinity_group_properties(aff_grps[0].name)
-print "-------Affinity Group Properties"
-print_stuff(aff_grp_prop)
-print "-------Affinity Group Hosted Services"
-print_stuff(aff_grp_prop.hosted_services)
-print "-------Affinity Group Storage Services"
-print_stuff(aff_grp_prop.storage_services)
+#aff_grp_prop = service.get_affinity_group_properties(aff_grps[0].name)
+#print "-------Affinity Group Properties"
+#print_stuff(aff_grp_prop)
+#print "-------Affinity Group Hosted Services"
+#print_stuff(aff_grp_prop.hosted_services)
+#print "-------Affinity Group Storage Services"
+#print_stuff(aff_grp_prop.storage_services)
 
 locations = service.list_locations()
 print "-------Locations"
