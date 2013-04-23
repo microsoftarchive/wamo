@@ -11,4 +11,5 @@ setup(name='azuremonitor',
       packages=['azuremonitor'],
       requires=['argparse', 'azure', 'OpenSSL'],
       scripts=['check_azure.py'],
+      long_description="""Monitoring utilities for Windows Azure. Use with Nagios and Zabbix.""",
      )

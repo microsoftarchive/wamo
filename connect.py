@@ -91,15 +91,15 @@ for deployment in svc.deployments:
         print "-------Role"
         print_stuff(role)
 
-#deployment = service.get_deployment_by_slot(svc.service_name, "Production")
-#print "-------Get Deployment"
-#print_stuff(deployment)
-#for role_inst in deployment.role_instance_list:
-#    print "-------Role Instance"
-#    print_stuff(role_inst)
-#for role in deployment.role_list:
-#    print "-------Role"
-#    print_stuff(role)
+deployment = service.get_deployment_by_slot(svc.service_name, "Production")
+print "-------Get Deployment"
+print_stuff(deployment)
+for role_inst in deployment.role_instance_list:
+    print "-------Role Instance"
+    print_stuff(role_inst)
+for role in deployment.role_list:
+    print "-------Role"
+    print_stuff(role)
 
 aff_grps = service.list_affinity_groups()
 print "-------List Affinity Groups"
@@ -115,20 +115,20 @@ for grp in aff_grps:
 #print "-------Affinity Group Storage Services"
 #print_stuff(aff_grp_prop.storage_services)
 
-locations = service.list_locations()
-print "-------Locations"
-for location in locations:
-    print_stuff(location)
+#locations = service.list_locations()
+#print "-------Locations"
+#for location in locations:
+#    print_stuff(location)
 
-oses = service.list_operating_systems()
-print "-------OSes"
-for o_s in oses:
-    print_stuff(o_s)
+#oses = service.list_operating_systems()
+#print "-------OSes"
+#for o_s in oses:
+#    print_stuff(o_s)
 
-os_fams = service.list_operating_system_families()
-print "-------OS Families"
-for fam in os_fams:
-    print_stuff(fam)
+#os_fams = service.list_operating_system_families()
+#print "-------OS Families"
+#for fam in os_fams:
+#    print_stuff(fam)
 
 sub = service.get_subscription()
 print "-------Subscription"
@@ -149,11 +149,11 @@ for data_disk in role.data_virtual_hard_disks:
 print "-------Role OS Disk"
 print_stuff(role.os_virtual_hard_disk)
 
-images = service.list_os_images()
-print "-------List OS Images"
-for image in images:
-    print "-------Image"
-    print_stuff(image)
+#images = service.list_os_images()
+#print "-------List OS Images"
+#for image in images:
+#    print "-------Image"
+#    print_stuff(image)
 
 
 
