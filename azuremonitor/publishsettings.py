@@ -4,6 +4,7 @@ import os
 import tempfile
 import xml.dom.minidom
 
+"""Contains the PublishSettings class."""
 
 class PublishSettings:
     """Class to represent a Windows Azure .publishsettings file"""
@@ -11,7 +12,7 @@ class PublishSettings:
     pkcs12_buf = None
 
     def __init__(self, ps_file):
-        """Parse the file and save the info"""
+        """Parse the ps file and save the info in the object."""
         ps_doc = xml.dom.minidom.parse(ps_file)
         publish_data = ps_doc.getElementsByTagName('PublishData')[0]
         publish_prof = publish_data.getElementsByTagName('PublishProfile')[0]
@@ -22,7 +23,11 @@ class PublishSettings:
 
     def write_pem(self, location=None):
         """Write the management certificate to a .pem file.
-           Either temporary or specified"""
+
+        location -- If specified, write pem to that location
+                    Otherwise, write to a temp file
+        Returns the full path of the file written.
+        """
         pkcs12 = OpenSSL.crypto.load_pkcs12(self.pkcs12_buf)
         cert = pkcs12.get_certificate()
         private_key = pkcs12.get_privatekey()

@@ -4,11 +4,13 @@ import argparse
 import os
 import sys
 import azure
+import logging
 from azure.servicemanagement import ServiceManagementService
 from azuremonitor.publishsettings import PublishSettings
 
 
 def handle_args():
+    """Create the parser, parse the args, and return them."""
     parser = argparse.ArgumentParser(description='Check Azure Compute',
                                      epilog='(c) MS Open Tech')
     parser.add_argument('hostname', help='hosted service to check')
@@ -24,6 +26,7 @@ def handle_args():
 
 
 def check_for_errors(service, hostname):
+    """Check the status of hostname, and return a list of errors."""
     #hosted_services = service.list_hosted_services()
     errors = []
     try:
@@ -51,6 +54,7 @@ def check_for_errors(service, hostname):
 
 
 def print_errors(errors, verbosity):
+    """Print the errors, and return the return code."""
     if errors:
         print ', '.join(errors)
         return 2
@@ -58,12 +62,22 @@ def print_errors(errors, verbosity):
         print 'All cool'
         return 0
 
+def setup_logger(verbose):
+    """Creates a logger, using the verbosity, and returns it."""
+    logger = logging.getLogger()
+    if verbose >= 3:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.WARNING)        
+    logger.addHandler(logging.StreamHandler())
+    return logger
 
 def main():
+    """Main procedure for Azure monitor utility."""
     args = handle_args()
 
-    if args.verbose >= 3:
-        print 'Converting publishsettings.'
+    logger = setup_logger(args.verbose)
+    logger.debug('Converting publishsettings.')
     try:
         publishsettings = PublishSettings(args.psfile)
     except Exception, error:
@@ -71,20 +85,17 @@ def main():
         print error
         sys.exit(1)
     pem_path = publishsettings.write_pem()
-    if args.verbose >= 3:
-        print 'Pem file saved to temp file {}'.format(pem_path)
-        print 'Azure sub id {}'.format(publishsettings.sub_id)
+    logger.debug('Pem file saved to temp file {0}'.format(pem_path))
+    logger.debug('Azure sub id {0}'.format(publishsettings.sub_id))
 
     service = ServiceManagementService(
         subscription_id=publishsettings.sub_id,
         cert_file=pem_path)
     errors = check_for_errors(service, args.hostname)
-    if args.verbose >= 3:
-        print 'Azure status retreived.'
+    logger.debug('Azure status retreived.')
 
     os.unlink(pem_path)
-    if args.verbose >= 3:
-        print 'Deleted pem.'
+    logger.debug('Deleted pem.')
 
     ret_val = print_errors(errors, args.verbose)
     sys.exit(ret_val)
