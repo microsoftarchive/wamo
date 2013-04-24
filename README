@@ -1,0 +1,137 @@
+Windows Azure Monitor
+=====================
+
+Introduction
+------------
+
+	Windows Azure Monitor includes utilities to monitor different aspects of Windows
+	Azure. These utilities are designed to be used with Nagios and Zabbix, but could
+	also be used in other creative ways.
+
+License
+-------
+	GPL?
+	See COPYING
+
+Installation
+------------
+
+	Two ways to install:
+
+	1. Download and extract the source package. Run 'python setup.py install' See 
+	   http://docs.python.org/2.7/install/index.html for additional information
+
+	2. Install using pip, 'pip install azuremonitor' Some distributions call pip
+	   pip-python.
+
+Dependencies
+------------
+
+	* Python 2.6 or 2.7
+	* azure - Window Azure sdk for Python
+	* argparse - for Python 2.6
+	* OpenSSL - pyOpenSSL
+
+Setup
+-----
+
+Nagios
+______
+
+	1. Create symlinks from your Nagios plugin directory to the Azure monitor utilities.
+	   Example::
+
+		ln -s /usr/bin/check_azure_compute.py /usr/lib64/nagios/plugins
+
+	2. Download your .publishsettings file for your Azure account. Something like:
+	   https://windows.azure.com/download/publishprofile.aspx
+
+	3. Move your .publishsetttings file to a safe place and protect it. Example::
+
+	   	mv azure.publishsettings /etc/nagios/private
+	   	chmod 640 /etc/nagios/private/azure.publishsettings
+	   	chown root:nagios /etc/nagios/private/azure.publishsettings
+
+	   Here only root and the nagios group, which nagios runs under, is allowed to
+	   read the file
+
+	4. Optionally set a variable in your resource.cfg (usually /etc/nagios/private/resource.cfg)
+	   To point to your publishsettings file
+
+	5. Setup a command in a config file as usual for nagios::
+
+	   	 define command{
+		         command_name    check_azure_compute
+			 command_line    $USER1$/check_azure_compute.py $HOSTADDRESS$ -p $PSFILE$
+		 }
+	
+Zabbix
+______
+
+	1. Use these utilities as an external check: https://www.zabbix.com/documentation/1.8/manual/config/items#external_checks
+
+	2. You may need to increase the timeout for external check in yor zabbix_server.conf::
+
+	       Timeout=10
+
+	3. Also in zabbix_server.conf, uncomment the ExternalScripts location, if commented::
+
+	   	ExternalScripts=/etc/zabbix/externalscripts
+
+	4. Link the utilities to that location. Example::
+
+	   	ln -s /usr/bin/check_azure_compute.py /etc/zabbix/externalscripts
+
+ 	5. Download your .publishsettings file for your Azure account. Something like:
+	   https://windows.azure.com/download/publishprofile.aspx
+
+	6. Move you .publishsetttings file to a safe place and protect it. Example::
+
+	   	mv azure.publishsettings /etc/zabbix
+	   	chmod 640 /etc/zabbix/azure.publishsettings
+	   	chown root:zabbix /etc/zabbix/azure.publishsettings
+
+	   Here only root and the zabbix group, which zabbix runs under, is allowed to
+	   read the file
+
+	7. Use the zabbix interface to setup the external check. Example::
+
+	       Item
+	       External check
+	       Key:	check_azure_compute.py[-p /etc/zabbix/azure.publishsettings]
+	       Type:	Character
+
+	8. Use the zabbix interface to setup the trigger. Example::
+
+	       Trigger
+	       Expression:
+	       {<host/template>:check_azure_compute.py[-p /etc/zabbix/azure.publishsettings].str(All cool)}=0
+
+Usage
+-----
+
+::
+
+  usage: check_azure_compute.py [-h] -p PSFILE [-v] [--version] hostname
+
+  Check Azure Compute
+
+  positional arguments:
+    hostname              hosted service to check
+
+  optional arguments:
+    -h, --help            show this help message and exit
+    -p PSFILE, --publish-settings PSFILE
+                          .publishsettings file to authenticate with azure
+    -v, --verbose         verbosity
+    --version             show program's version number and exit
+
+  (c) MS Open Tech
+
+Changelog
+---------
+
+0.1
+___
+Initial Release.
+

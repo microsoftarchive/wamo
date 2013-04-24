@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(name='azuremonitor',
       version='0.1',
-      description='Windows Azure monitor',
+      description='Windows Azure Monitor',
       author='Jeff Mendoza',
       author_email='jemendoz@microsoft.com',
       url='https://pypi.python.org/pypi/azuremonitor/',
