@@ -1,5 +1,21 @@
 #!/usr/bin/python
 
+# Copyright 2013 MS Open Tech
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#check_azure_compute.py: Azure compute monitor script
+
 import argparse
 import os
 import sys
@@ -19,23 +35,37 @@ def handle_args():
         required=True,
         help='.publishsettings file to authenticate with azure',
         dest='psfile')
+    parser.add_argument('-a', '--all', action='store_true',
+                        help='check all hosted services, ignores hostname')
     parser.add_argument('-v', '--verbose', action='count', 
                         default=0, help='verbosity')
     parser.add_argument('--version', action='version', version='%(prog)s 0.1')
     return parser.parse_args()
 
 
-def check_for_errors(service, hostname):
+def check_for_errors_all(management):
+    """Check the status of all hosted services, and return a list of errors."""
+    hosted_services = management.list_hosted_services()
+    errors = []
+    if not hosted_services:
+        errors.append('No hosted services found')
+    for service in hosted_services:
+        errors_host = check_for_errors(management, service.service_name)
+        if errors_host:
+            errors.append(' '.join(('{0}:'.format(service.service_name), errors_host)))
+    return '; '.join(errors)
+
+
+def check_for_errors(management, hostname):
     """Check the status of hostname, and return a list of errors."""
-    #hosted_services = service.list_hosted_services()
     errors = []
     try:
-        service = service.get_hosted_service_properties(
+        service = management.get_hosted_service_properties(
             hostname,
             embed_detail=True)
     except azure.WindowsAzureMissingResourceError, error:
         errors.append('Hosted service {0} not found'.format(hostname))
-        return errors
+        return ', '.join(errors)
     if service.hosted_service_properties.status != 'Created':
         errors.append('Service status: {0}'.format(service.hosted_service_properties.status))
     if not service.deployments:
@@ -50,13 +80,13 @@ def check_for_errors(service, hostname):
                 errors.append('Power state: {0}'.format(role_inst.power_state))
             if role_inst.instance_status != 'ReadyRole':
                 errors.append('Role status: {0}'.format(role_inst.instance_status))
-    return errors
+    return ', '.join(errors)
 
 
 def print_errors(errors, verbosity):
     """Print the errors, and return the return code."""
     if errors:
-        print ', '.join(errors)
+        print errors
         return 2
     else:
         print 'All cool'
@@ -88,10 +118,13 @@ def main():
     logger.debug('Pem file saved to temp file {0}'.format(pem_path))
     logger.debug('Azure sub id {0}'.format(publishsettings.sub_id))
 
-    service = ServiceManagementService(
+    management = ServiceManagementService(
         subscription_id=publishsettings.sub_id,
         cert_file=pem_path)
-    errors = check_for_errors(service, args.hostname)
+    if args.all:
+        errors = check_for_errors_all(management)
+    else:
+        errors = check_for_errors(management, args.hostname)
     logger.debug('Azure status retreived.')
 
     os.unlink(pem_path)
