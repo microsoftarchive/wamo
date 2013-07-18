@@ -31,6 +31,7 @@ Dependencies
 	* azure - Window Azure sdk for Python
 	* argparse - for Python 2.6
 	* OpenSSL - pyOpenSSL
+	* pyodbc - connect to Azure SQL
 
 Setup
 -----
@@ -42,6 +43,10 @@ ______
 	   Example::
 
 		ln -s /usr/bin/check_azure_compute.py /usr/lib64/nagios/plugins
+		ln -s /usr/bin/check_azure_ad.py /usr/lib64/nagios/plugins
+		ln -s /usr/bin/check_azure_sql.py /usr/lib64/nagios/plugins
+		ln -s /usr/bin/check_azure_storage.py /usr/lib64/nagios/plugins
+		ln -s /usr/bin/check_azure_paas.py /usr/lib64/nagios/plugins
 
 	2. Download your .publishsettings file for your Azure account. Something like:
 	   https://windows.azure.com/download/publishprofile.aspx
@@ -60,11 +65,39 @@ ______
 
 	5. Setup a command in a config file as usual for nagios::
 
-	   	 define command{
-		         command_name    check_azure_compute
-			 command_line    $USER1$/check_azure_compute.py $HOSTADDRESS$ -p $PSFILE$
-		 }
-	
+	   	define command{
+			command_name    check_azure_compute
+			command_line    $USER1$/check_azure_compute.py $HOSTADDRESS$ -p $PSFILE$
+		}
+		define command{
+			command_name    check_azure_sql
+			command_line    $USER1$/check_azure_sql.py $HOSTADDRESS$ $ARG1$
+		}
+
+		define command{
+			command_name    check_azure_ad
+			command_line    $USER1$/check_azure_ad.py $HOSTADDRESS$ $ARG1$
+		}
+
+		define command{
+			command_name    check_azure_paas
+			command_line    $USER1$/check_azure_paas.py $HOSTADDRESS$ $ARG1$
+		}
+
+		define command{
+			command_name    check_azure_storage
+			command_line    $USER1$/check_azure_storage.py $HOSTADDRESS$ $ARG1$
+		}
+
+	6. In the service file setup appropriate parameters. Examples::
+		check_command       check_azure_sql!-d azuredb -u username -p pwd  -k dbsize -vv!
+		check_command       check_azure_ad!-c clientid -s secret -k listusers -vv!
+        check_command       check_azure_paas!-p psfile -s storageact -k availmemory -w 3000: -c 2000: -vv!
+        check_command       check_azure_storage!-p psfile --table --tx  -k percentsuccess -w 99: -c 95:!
+
+
+
+
 Zabbix
 ______
 
@@ -127,6 +160,127 @@ Usage
     --version             show program's version number and exit
 
   (c) MS Open Tech
+
+usage: check_azure_ad.py [-h] -c CLIENTID -s SECRET [-p PARAM] -k KEY
+                         [-t TEMPDIR] [--warn-on-change | --error-on-change]
+                         [-v] [--version]
+                         domain
+
+Check Azure Active Directory
+
+positional arguments:
+  domain                Specify Azure Active Directory domain
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CLIENTID, --clientid CLIENTID
+                        Specify Azure AD client id
+  -s SECRET, --secret SECRET
+                        Specify Azure AD secret used for programmatic access
+  -p PARAM, --param PARAM
+                        param: user name or group name depending on command
+  -k KEY, --key KEY     key - Key used to invoke specific API or get status of
+                        Azure AD
+  -t TEMPDIR, --tempdir TEMPDIR
+                        Temporary directory to save intermediate files
+  --warn-on-change      Change in users, groups, or membership to be flagged
+                        as warning
+  --error-on-change     Change users, groups, or membership to be flagged as
+                        error
+  -v, --verbose         Verbosity
+  --version             show program's version number and exit
+
+(c) MS Open Tech
+
+usage: check_azure_paas.py [-h] -s STORAGEACT -p PSFILE [-f CERT] [-a]
+                           [-w WARNING] [-c CRITICAL] [-k KEY] [-v]
+                           [--version]
+                           cloudservice
+
+Check Azure PAAS Deployments
+
+positional arguments:
+  cloudservice          Name of the cloud service to check
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s STORAGEACT, --storageact STORAGEACT
+                        Azure storage account where service counters are saved
+  -p PSFILE, --publish-settings PSFILE
+                        .publishsettings file to authenticate with azure
+  -f CERT, --certname CERT
+                        Cert authentication filename. needed on Windows
+  -a, --all             check all hosted cloud services, ignores cloudservice
+                        parameter
+  -w WARNING, --warning WARNING
+                        Specify warning range
+  -c CRITICAL, --critical CRITICAL
+                        Specify critical range
+  -k KEY, --key KEY     Status/Counter to check
+  -v, --verbose         verbosity
+  --version             show program's version number and exit
+
+(c) MS Open Tech
+
+usage: check_azure_sql.py [-h] -u USER [-p PASSWORD] -d DATABASE [-w WARNING]
+                          [-c CRITICAL] -k KEY [-v] [--version]
+                          hostname
+
+Check SQL Azure
+
+positional arguments:
+  hostname              Azure SQL Server Address to check
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -u USER, --username USER
+                        Specify MSSQL User Name
+  -p PASSWORD, --password PASSWORD
+                        Specify MSSQL Password
+  -d DATABASE, --database DATABASE
+                        Specify Azure DB
+  -w WARNING, --warning WARNING
+                        Specify warning range
+  -c CRITICAL, --critical CRITICAL
+                        Specify critical range
+  -k KEY, --key KEY     Specify key for the DMV or SQL view
+  -v, --verbose         verbosity
+  --version             show program's version number and exit
+
+(c) MS Open Tech
+
+usage: check_azure_storage.py [-h] -p PSFILE [-f CERT]
+                              (--table | --blob | --queue) (--tx | --cap) [-a]
+                              [-w WARNING] [-c CRITICAL] [-k KEY] [-v]
+                              [--version]
+                              storageact
+
+Check Azure Compute
+
+positional arguments:
+  storageact            Name of the storage acct name to check
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -p PSFILE, --publish-settings PSFILE
+                        .publishsettings file to authenticate with azure
+  -f CERT, --certname CERT
+                        cert authentication with azure. needed on Windows
+  --table               Check table service
+  --blob                Check blob service
+  --queue               Check queue service
+  --tx                  Check transaction metrics
+  --cap                 Check capacity metrics. Applies only to -blob
+  -a, --all             Check all storage accounts, ignores storageact
+  -w WARNING, --warning WARNING
+                        Specify warning range
+  -c CRITICAL, --critical CRITICAL
+                        Specify critical range
+  -k KEY, --key KEY     Status/Counter to check
+  -v, --verbose         verbosity
+  --version             show program's version number and exit
+
+(c) MS Open Tech
 
 Changelog
 ---------
