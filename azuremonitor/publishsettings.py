@@ -32,9 +32,13 @@ class PublishSettings:
         ps_doc = xml.dom.minidom.parse(ps_file)
         publish_data = ps_doc.getElementsByTagName('PublishData')[0]
         publish_prof = publish_data.getElementsByTagName('PublishProfile')[0]
-        pkcs12_b64 = publish_prof.getAttribute('ManagementCertificate')
+        schema_version = publish_prof.getAttribute('SchemaVersion')
         sub = publish_prof.getElementsByTagName('Subscription')[0]
         self.sub_id = sub.getAttribute('Id')
+        if not schema_version:
+            pkcs12_b64 = publish_prof.getAttribute('ManagementCertificate')
+        else:
+            pkcs12_b64 = sub.getAttribute('ManagementCertificate')
         self.pkcs12_buf = base64.b64decode(pkcs12_b64)
 
     def write_pem(self, location=None):
