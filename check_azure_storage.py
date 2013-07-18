@@ -28,6 +28,7 @@ from azure.servicemanagement import ServiceManagementService
 import sys
 from datetime import datetime
 from datetime import timedelta
+import exceptions
 
 logger = None            # pylint: disable-msg=C0103
 
@@ -47,12 +48,14 @@ COUNTERS     = {
     'requests'         : { 'help' : 'Get total requests',
                             'measure'   :  'TotalRequests',
                             'nagios_message' : 'Total number of requests %s',
+                            'unit' : '',
                             #'direction' : 'NA'
                             },      
     'billablerequests': { 'help' : 'Get Total billable requests',
                             'measure'   :  'TotalBillableRequests',
                             'nagios_message' : 
                                     'Total number of billable requests %s',
+                            'unit' : '',
                             #'direction' : 'NA'
                             },      
     'availability': { 'help' : 'Get availability',
@@ -134,10 +137,10 @@ def property_value(row, prop):
 
 def handle_args():
     """Create the parser, parse the args, and return them."""
-    parser = argparse.ArgumentParser(description='Check Azure Compute',
+    parser = argparse.ArgumentParser(description='Check Azure Storage',
                                      epilog='(c) MS Open Tech')
     parser.add_argument('storageact', 
-                        help='Name of the storage acct name to check')    
+                        help='Storage account name to check')
     parser.add_argument(
         '-p', '--publish-settings',
         required=True,
@@ -172,9 +175,9 @@ def handle_args():
                         help='Check all storage accounts, ignores storageact')
 
     parser.add_argument('-w', '--warning', required=False, dest='warning',
-                        help='Specify warning range')
+                        help='Specify warning threshold')
     parser.add_argument('-c', '--critical', required=False, dest='critical',
-                        help='Specify critical range')
+                        help='Specify critical threshold')
     parser.add_argument('-k', '--key', required=False, dest='key',
                         help='Status/Counter to check')
     parser.add_argument('-v', '--verbose', action='count', 
@@ -380,10 +383,10 @@ def check_storagetx_errors(table_service, storage_type, key, warning,
             errors.append(error)        
     except azure.WindowsAzureMissingResourceError, error:
         error_code = 3
-        errors.append('Performance table not found')
-    except:
+        errors.append('Performance table not found.')
+    except exceptions.KeyError, error:
         error_code = 3
-        errors.append('Internal error while fetching performance table')        
+        errors.append('Specified key was not found.')
     return error_code, '; '.join(errors)
 
 
