@@ -300,11 +300,13 @@ def setup_logger(verbose):
 def retrieve_keys(management, storageacct):
     """retrieve primary and secondary storage keys."""
     try:
-        storage_keys = management.get_storage_account_keys(storageacct)
+        storage_keys = management.get_storage_account_keys(storageacct.lower())
         temp_primary_key  = storage_keys.storage_service_keys.primary
         temp_secondary_key = storage_keys.storage_service_keys.secondary
         return temp_primary_key, temp_secondary_key
-    except:
+    except azure.WindowsAzureError, error:
+        global logger
+        logger.debug(error)
         return None, None
 
 
