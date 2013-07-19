@@ -508,12 +508,14 @@ def get_deltalink_url(key, mytempdir):
     """gets the deltalink url 
     key - keys representing various commands from the COUNTERS list
     """
-    tempdir = tempfile.gettempdir()
     deltalinks = {}
     deltalink_url = None
     try:
         mytempdir = get_plugin_tempdir(mytempdir)
-        with open(mytempdir+'/azure_ad.dat','r+') as deltalink_file: 
+        if mytempdir is None:
+            logger.error('Error. No temp dir path found for saving deltalinks file')
+            return None, {}
+        with open(mytempdir + '/azure_ad.dat','r+') as deltalink_file: 
             deltalinks_txt = deltalink_file.read()
             deltalinks = json.loads(deltalinks_txt)
             if key in deltalinks:
@@ -521,7 +523,7 @@ def get_deltalink_url(key, mytempdir):
             deltalink_file.close()
             return deltalink_url, deltalinks
     except IOError:
-        logger.debug ('Error opening/reading temp file.')
+        logger.error ('Error opening/reading temp file.')
         return None, {}
 
          
@@ -629,16 +631,14 @@ def check_aad_errors( args):
 def get_plugin_tempdir(mytempdir):
     if mytempdir:
         return mytempdir
+    if os.name != 'nt':
+        nag_temppaths = ['/var/log/nagios', '/var/lib/nagios3']
     else:
-        if os.name != 'nt':
-            nag_temppaths = ['/var/log/nagios','/var/lib/nagios3']
-        else:
-            nag_temppaths = [tempfile.gettempdir()]
-
-        for path in nag_temppaths:
-            if os.path.isdir(path):
-                return path
-        return None
+        nag_temppaths = [tempfile.gettempdir()]
+    for path in nag_temppaths:
+        if os.path.isdir(path):
+            return path
+    return None
 
 
 def update_deltalinks(deltalinks, deltalink_url, key, mytempdir):
