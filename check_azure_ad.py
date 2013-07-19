@@ -61,11 +61,11 @@ def analyze_group(group, verbosity, error_level):
     Returns the Nagios error code (always 0) and error message (group defn)
     """
     return 0, '{name:%s, description:%s, objectId:%s, Security enabled:%r, '\
-              'Dirsync enabled:%r, mail enabled:%r}' % (group['displayName'],  
-                                                        group['description'], 
-                                                        group['objectId'], 
-                                                        group['securityEnabled'], 
-                                                        group['dirSyncEnabled'], 
+              'Dirsync enabled:%r, mail enabled:%r}' % (group['displayName'],
+                                                        group['description'],
+                                                        group['objectId'],
+                                                        group['securityEnabled'],
+                                                        group['dirSyncEnabled'],
                                                         group['mailEnabled'])
 
 
@@ -130,7 +130,7 @@ def get_group_displayname(group_id):
     group_id -- objectId of an AAD group
     Returns the display name of the AAD group
     """
-    #global tenant_domain
+    global tenant_domain
     url = BASEURLONEPARAM % (tenant_domain, 'groups', group_id)
     error_code, content = get_from_aad(url)
     if error_code == 0:
@@ -455,11 +455,13 @@ def handle_args():
         dest='tempdir')
 
     group = parser.add_mutually_exclusive_group(required=False)
-    group.add_argument('--warn-on-change', action='store_const', const=1, 
-                       dest='level',  help='Change in users, groups, or membership to be flagged as warning', 
+    group.add_argument('--warn-on-change', action='store_const', const=1,
+                       dest='level',
+                       help='Change in users, groups, or membership to be flagged as warning',
                        default=0)
-    group.add_argument('--error-on-change', action='store_const', const=2, 
-                       dest='level',  help='Change  users, groups, or membership to be flagged as error', 
+    group.add_argument('--error-on-change', action='store_const', const=2,
+                       dest='level',
+                       help='Change  users, groups, or membership to be flagged as error',
                        default=0)
 
     parser.add_argument('-v', '--verbose', action='count', 
@@ -510,6 +512,7 @@ def get_deltalink_url(key, mytempdir):
     """
     deltalinks = {}
     deltalink_url = None
+    global logger
     try:
         mytempdir = get_plugin_tempdir(mytempdir)
         if mytempdir is None:
@@ -567,6 +570,7 @@ def check_aad_errors_for_deltaapi(api, args):
     args - program options/switches
     returns NAGIOS error_code and NAGIOS output
     """
+    global logger
     found_deltalink = False
     url = api['url'] % (args.domain, '')
     deltalink_url, deltalinks = get_deltalink_url(args.key, args.tempdir)
@@ -629,6 +633,7 @@ def check_aad_errors( args):
 
 
 def get_plugin_tempdir(mytempdir):
+    """If mytempdir is not set, set to a save directory for saving state."""
     if mytempdir:
         return mytempdir
     if os.name != 'nt':
@@ -679,6 +684,7 @@ def connect_to_aad(client_id, client_secret):
     client_secret - client secret
     return NAGIOS error code and connection data / error
     """
+    global tenant_domain
     url = 'https://login.windows.net/'+tenant_domain+\
                 '/oauth2/token?api-version=1.0'
     values = {'grant_type':'client_credentials',
@@ -712,8 +718,6 @@ def extract_connection_token(content):
 def main():
     """Main procedure for Azure AD monitor utility."""
     global logger
-    global token
-    global token_type
     global tenant_domain
     args = handle_args()
 
