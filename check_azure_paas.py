@@ -18,14 +18,14 @@
 
 import argparse
 import azure
-from azure.storage.cloudstorageaccount import CloudStorageAccount
-import logging
-import os
-from azuremonitor.publishsettings import PublishSettings
 from azure.servicemanagement import ServiceManagementService
-import sys
+from azure.storage.cloudstorageaccount import CloudStorageAccount
+from azuremonitor.publishsettings import PublishSettings
 from datetime import datetime
 from datetime import timedelta
+import logging
+import os
+import sys
 
 primary_key = None       # pylint: disable-msg=C0103
 logger = None            # pylint: disable-msg=C0103
@@ -295,7 +295,6 @@ def setup_logger(verbose):
     else:
         logger.setLevel(logging.WARNING)        
     logger.addHandler(logging.StreamHandler())
-    return logger
 
 
 def retrieve_keys(management, storageacct):
@@ -361,7 +360,6 @@ def check_service(management, cloudservice, verbosity = 0):
     """Check the status of the cloud service, and return error."""
     errors = []
     error_code_all = 0
-    global primary_key
 
     try:
         service = management.get_hosted_service_properties(
@@ -438,7 +436,7 @@ def main():
         print 'Cloudservice name missing'        
         sys.exit(3)
 
-    logger = setup_logger(args.verbose)
+    setup_logger(args.verbose)
     logger.debug('Converting publishsettings.')
     try:
         publishsettings = PublishSettings(args.psfile)

@@ -112,14 +112,13 @@ def is_within_range(nagstring, value):
     raise Exception('Improper warning/critical parameter format.')
 
 
-def nagios_eval(result, warning, critical, nagios_message, key, unit='', 
+def nagios_eval(result, warning, critical, nagios_message, unit='', 
                 verbosity = 0):
     """check result with respect to warning and critical range 
     result -- counter value
     warning -- nagios warning range string
     critical -- nagios critical range string
     nagios_message -- Nagios message 
-    key -- key name
     unit -- unit for the perf counter value
     verbosity -- nagios verbosity value
     Returns nagios code, and error message
@@ -165,7 +164,7 @@ def analyze_dbsize(dbname, counter, row, warning, critical, verbosity):
     nagios_message = 'Size:%s' 
     result = row[0]
     error_code, message = nagios_eval(result, warning, critical, nagios_message, \
-                                      '', 'MB', verbosity)
+                                      'MB', verbosity)
     return error_code, message
 
 
@@ -181,7 +180,7 @@ def analyze_objsize(dbname, counter, row, warning, critical, verbosity):
     nagios_message = 'Object:%s,  Size:%%s' % (row[0],)
     result = row[1]
     error_code, message = nagios_eval(result, warning, critical, nagios_message, 
-                                      '', 'MB', verbosity)
+                                      'MB', verbosity)
     return error_code, message
 
 
@@ -198,7 +197,7 @@ def analyze_conn_info(dbname, counter, row, warning, critical, verbosity):
                             (dbname, row[2],)
     result = row[4]
     error_code, message = nagios_eval(result, warning, critical, 
-                                      nagios_message, '', 'ms', verbosity)
+                                      nagios_message, 'ms', verbosity)
     return error_code, message
 
 
@@ -214,7 +213,7 @@ def analyze_top5_queries(dbname, counter, row, warning, critical, verbosity):
     nagios_message = 'Database:%s, query:%s,  CPU time:%%s' % (dbname, row[2],)
     result = row[1]
     error_code, message = nagios_eval(result, warning, critical, 
-                                      nagios_message, '', 'ms', verbosity)
+                                      nagios_message, 'ms', verbosity)
     return error_code, message
 
 
@@ -238,7 +237,7 @@ def analyze_queryplan(dbname, counter, row, warning, critical, verbosity):
                         (dbname, strquery, )
     result = row[1]
     error_code, message = nagios_eval(result, warning, critical, 
-                                      nagios_message, '', 'ms', verbosity)
+                                      nagios_message, 'ms', verbosity)
     return error_code, message
 
     
@@ -256,7 +255,7 @@ def analyze_bwusage(dbname, counter, row, warning, critical, verbosity):
                     (row[1], str(row[0]), row[2], row[3], row[4],)
     result = row[5]
     error_code, message = nagios_eval(result, warning, critical, 
-                                      nagios_message, '', 'MB', verbosity)
+                                      nagios_message, 'MB', verbosity)
     return error_code, message
 
 
@@ -274,7 +273,7 @@ def analyze_dbusage(dbname, counter, row, warning, critical, verbosity):
                         (dbname, str(row[0]), row[1], )
     result = row[2]
     error_code, message = nagios_eval(result, warning, critical, 
-                                      nagios_message, '', 'MB', verbosity)
+                                      nagios_message, 'MB', verbosity)
     return error_code, message
 
 
@@ -298,7 +297,7 @@ def analyze_resstat(dbname, counter, row, warning, critical, verbosity):
                                                  end_time, size,  )
     result = row[5]
     error_code, message = nagios_eval(result, warning, critical, 
-                                      nagios_message, '', 'MB', verbosity)
+                                      nagios_message, 'MB', verbosity)
     return error_code, message
 
 
@@ -318,7 +317,7 @@ def analyze_resusage(dbname, counter, row, warning, critical, verbosity):
                 % ( row[1], row[2], query_time, size,)
     result = row[3]
     error_code, message = nagios_eval(result, warning, critical, 
-                                      nagios_message, '', '%', verbosity)
+                                      nagios_message, '%', verbosity)
     return error_code, message
 
 
@@ -340,7 +339,7 @@ def analyze_opstatus(dbname, counter, row, warning, critical, verbosity):
                         ( row[0], row[1], row[3], row[4], )
     result = row[2]
     error_code, message = nagios_eval(result, warning, critical, 
-                                      nagios_message, '', '', verbosity)
+                                      nagios_message, '', verbosity)
     return error_code, message
 
 
@@ -369,7 +368,7 @@ def analyze_conection(dbname, counter, row, warning, critical, verbosity):
                                                     throttled_conn,)         
     result = row[4]
     error_code, message = nagios_eval(result, warning, critical, 
-                                      nagios_message, '', '', verbosity)
+                                      nagios_message, '', verbosity)
     return error_code, message
 
 
@@ -393,7 +392,7 @@ def analyze_eventlog(dbname, counter, row, warning, critical, verbosity):
                     (database,  start_time,  row[6],  count, row[9],  )   
     result = row[7]
     error_code, message = nagios_eval(result, warning, critical, 
-                                      nagios_message, '', '', verbosity)
+                                      nagios_message, '', verbosity)
     return error_code, message    
 
 

@@ -198,7 +198,7 @@ def eval_counter_for_nagios(row, counter, warning, critical, verbosity):
     unit = counter['unit']
 
     return nagios_eval(val, warning, critical, counter['nagios_message'], 
-                       property, unit, verbosity)
+                       unit, verbosity)
 
 
 def is_within_range(nagstring, value):
@@ -232,7 +232,7 @@ def is_within_range(nagstring, value):
     raise Exception('Improper warning/critical parameter format.')
 
 
-def nagios_eval(result, warning, critical, nagios_message, key, unit='', 
+def nagios_eval(result, warning, critical, nagios_message, unit='', 
                 verbosity = 0):
     """evaluate result with respect to warning and critical range and 
         return appropriate error message
@@ -240,7 +240,6 @@ def nagios_eval(result, warning, critical, nagios_message, key, unit='',
     warning -- nagios warning range string
     critical -- nagios critical range string
     nagios_message -- Nagios message 
-    key -- key name
     unit -- unit for the perf counter value
     verbosity -- nagios verbosity value
     Returns nagios code, and error message
