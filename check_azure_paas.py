@@ -188,6 +188,7 @@ def get_and_check_counter(counter, cloudservice_name, management,
         return 1, 'No deployments found'
 
     # find the production deployment among deployments 
+    production_depl = None
     for depl in service.deployments:
         if depl.deployment_slot == 'Production':
             production_depl = depl
@@ -214,6 +215,8 @@ def get_and_check_counter(counter, cloudservice_name, management,
                 filter_str = role_clause + ' and ' + \
                             partition_clause + ' and ' + counter_clause
 
+                logger.debug('Checking Table: {0}, Filter: {1}'.format(
+                        table_name, filter_str))
                 results = table_service.query_entities(table_name=table_name, 
                                                        filter=filter_str)
                 if len(results) != 0:

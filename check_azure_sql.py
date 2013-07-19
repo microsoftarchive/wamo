@@ -17,6 +17,7 @@
 #check_azure_compute.py: Azure compute monitor script
 
 import argparse
+import exceptions
 import logging
 import os
 import pyodbc
@@ -649,11 +650,13 @@ def main():
         if args.database:
             mssql_db, _ = connect_db(args, args.database)
         mssql_master, _ = connect_db(args, 'master')
-    except:
-        return 3, 'Error connecting to database'
-
+    except exceptions.Exception, e:
+        print e
+        print 'Error connecting to database'
+        sys.exit(3)
     if not mssql_db or not mssql_master:
-        return 3, 'Error connecting to database'
+        print 'Error connecting to database'
+        sys.exit(3)
 
     error = ''
     error_code = 0
