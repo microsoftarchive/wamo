@@ -30,6 +30,9 @@ setup(name='azuremonitor',
       license='Apache License, Version 2.0',
       packages=['azuremonitor'],
       requires=['argparse', 'azure', 'OpenSSL', 'pyodbc'],
-      scripts=['check_azure_ad.py', 'check_azure_sql.py', 'check_azure_storage.py', 'check_azure_paas.py'],
-      long_description=long_description,
-     )
+      scripts=['check_azure_compute.py',
+               'check_azure_ad.py',
+               'check_azure_sql.py',
+               'check_azure_storage.py',
+               'check_azure_paas.py'],
+      long_description=long_description,)
