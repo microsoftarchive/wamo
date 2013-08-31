@@ -667,8 +667,10 @@ def main():
                                                args.critical, 
                                                args.verbose )
 
-    if error_code == 0 and error == '':
-        error = 'OK'
+    if error_code == 0:
+        if args.verbose <= 1:
+            error = 'OK'
+		
     print error
     sys.exit(error_code)
 

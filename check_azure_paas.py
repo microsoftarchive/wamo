@@ -39,23 +39,27 @@ COUNTERS     = {
                         },          
     'asperrors'        : { 'help'      : 'Get ASP.NET errors per sec ',
                         'nagios_message'    : 'ASP.NET errors per sec is %s',
+                        'unit'      : '',
                         'perf_counter'   :
                             r'\ASP.NET Applications(__Total__)\Errors Total/Sec',
                         'direction' : 'NA',
                         },          
     'asprequests'      : { 'help'      : 'Get ASP.NET requests per sec ',
                         'nagios_message'    : 'ASP.NET requests per sec is %s',
+                        'unit'      : '',
                         r'perf_counter'   :  
                             r'\ASP.NET Applications(__Total__)\Requests/Sec',
                         'direction' : 'NA',
                         },          
     'requestsqueued'     : { 'help'      : 'Get ASP.NET requests queued',
                         'nagios_message'    : 'ASP.NET requests queued %s',
+                        'unit'      : '',
                         r'perf_counter'   :  r'\ASP.NET\Requests Queued',
                         'direction' : 'NA',
                         },          
     'requestsrejected' : { 'help'      : 'Get ASP.NET requests rejected',
                         'nagios_message'    : 'ASP.NET requests rejected %s',
+                        'unit'      : '',
                         r'perf_counter'   :  r'\ASP.NET\Requests Rejected',
                         'direction' : 'NA',
                         },          
@@ -65,12 +69,14 @@ COUNTERS     = {
                         r'perf_counter'   :  r'\Memory\Available MBytes',
                         },          
     'wsbytespersec'     : { 'help'      : 'Get web service bytes per sec',
+                        'unit'      : '',
                         r'perf_counter'   :  
                             r'\Web Service(_Total)\Bytes Total/Sec',
                         'direction' : 'NA',                  
                         'nagios_message'    : 'Web service bytes per sec %s',
                         },          
     'wsextpersec'     : { 'help'      : 'Get web service ext requests per sec',
+                        'unit'      : '',
                         r'perf_counter'   :  
                             r'\Web Service(_Total)\ISAPI Extension Requests/sec',
                         'direction' : 'NA',
@@ -469,7 +475,7 @@ def main():
             if os.name != 'nt':
                 os.unlink(pem_path)
                 logger.debug('Deleted pem.')
-            print 'Error retrieving storage keys'
+            print 'Invalid storage account or error retrieving storage keys'
             sys.exit(3)
 
     error = ''

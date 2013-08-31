@@ -554,12 +554,17 @@ def check_aad_errors_for_simpleapi(api, args):
                                                   args.level)
             errors.append(error)
         elif api['size'] == 'multiple':
-            for val in content['value']:
-                error_code, error = api['analyzefn'](val, 
-                                                     args.verbose, 
-                                                     args.level)  
-                errors.append(error)
-        return 0, ', '.join(errors)      
+			if not content['value']:
+				error_code = 1
+				errors.append("No data")
+			else:				
+				for val in content['value']:
+					temp_error_code, error = api['analyzefn'](val, 
+														 args.verbose, 
+														 args.level)  
+					error_code = max(error_code, temp_error_code)
+					errors.append(error)
+        return error_code, ', '.join(errors)      
     else:
         return error_code, content             
 
