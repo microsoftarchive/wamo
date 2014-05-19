@@ -204,8 +204,8 @@ def get_and_check_counter(counter, cloudservice_name, management,
         try:
             storage_account = CloudStorageAccount(storageacct_name, primary_key)
             table_service = storage_account.create_table_service()
-            table_name = 'WAD'+ str(production_depl.private_id) + \
-                            'PT'+ '1H' +'R'+'Table'
+            table_name = 'WADPerformanceCountersTable'
+            
             error_code_all = 0
             for role in production_depl.role_list:
                 role_clause = 'Role eq \''+ role.role_name + '\''
@@ -228,7 +228,7 @@ def get_and_check_counter(counter, cloudservice_name, management,
                 if len(results) != 0:
                     latest_result = results[len(results)-1]
                     error_code, error = nagios_eval(  role.role_name, 
-                                                      latest_result.Total,
+                                                      latest_result.CounterValue,
                                                       warning,
                                                       critical,
                                                       counter['nagios_message'],
