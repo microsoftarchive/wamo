@@ -349,11 +349,11 @@ def check_storagetx_errors(table_service, storage_type, key, warning,
         storage_type = storage_type.lower()
 
         if storage_type == 'blob':
-            table_name = '$MetricsTransactionsBlob'
+            table_name = '$MetricsHourPrimaryTransactionsBlob'
         elif storage_type == 'table':
-            table_name = '$MetricsTransactionsTable'
+            table_name = '$MetricsHourPrimaryTransactionsTable'
         else:
-            table_name = '$MetricsTransactionsQueue'
+            table_name = '$MetricsHourPrimaryTransactionsQueue'
         rows = table_service.query_entities(table_name = table_name, 
                                             filter = recenthour_partitionkey)
 
