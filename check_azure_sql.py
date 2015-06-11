@@ -27,8 +27,9 @@ from datetime import timedelta
 
 logger = None
 
-DBSIZE_DMV =  '''SELECT SUM(reserved_page_count)*8.0/1024 FROM 
+DBSIZE_DMV =  '''SELECT SUM(reserved_page_count)*8.0/1024, CONVERT(BIGINT, DATABASEPROPERTYEX(DB_NAME(), 'MaxSizeInBytes')) / (1024*1024) FROM 
                 sys.dm_db_partition_stats;'''
+
 OBJSIZE_DMV =  '''SELECT sys.objects.name, SUM(reserved_page_count)
                  * 8.0 / 1024 FROM sys.dm_db_partition_stats, sys.objects  
                 WHERE sys.dm_db_partition_stats.object_id = 
@@ -161,10 +162,12 @@ def analyze_dbsize(dbname, counter, row, warning, critical, verbosity):
     critical - critical range argument to the command
     verbosity - verbose argument to the command. 
     """
-    nagios_message = 'Size:%s' 
-    result = row[0]
+    currsize = float(row[0])
+    maxsize = float(row[1])
+    result = (currsize/maxsize)*100
+    nagios_message = 'Size:%f/%f %%s' % (currsize, maxsize)
     error_code, message = nagios_eval(result, warning, critical, nagios_message, \
-                                      'MB', verbosity)
+                                      '%', verbosity)
     return error_code, message
 
 
@@ -431,41 +434,41 @@ SQL_QUERIES     = {
                       'printfn'   :  analyze_bwusage,
                       'db'        : 'master',
                       },                   
-    'dbusage'       : { 'help'      : 'Databse usage (Daily)',
+    'dbusage'       : { 'help'      : 'Database usage (Daily)',
                       'query'     : DBUSAGE_VIEW,
                       'size'      : 'multiple',
                       'printfn'   :  analyze_dbusage,
                       'db'        : 'master',
                       'frequency' : 'daily'
                       },                   
-    'resstat'       : { 'help'      : 'Databse Resource Status (Daily)',
+    'resstat'       : { 'help'      : 'Database Resource Status (Daily)',
                       'query'     : RESSTAT_VIEW,
                       'size'      : 'multiple',
                       'printfn'   :  analyze_resstat,
                       'db'        : 'master',
                       'frequency' : 'hourly'
                       },                   
-    'resusage'       : { 'help'      : 'Databse Resource usage (Daily)',
+    'resusage'       : { 'help'      : 'Database Resource usage (Daily)',
                       'query'     : RESUSAGE_VIEW,
                       'size'      : 'multiple',
                       'printfn'   :  analyze_resusage,
                       'db'        : 'master',
                       'frequency' : 'daily'
                       },                   
-    'opstatus'       : { 'help'      : 'Databse Op Status (Daily)',
+    'opstatus'       : { 'help'      : 'Database Op Status (Daily)',
                       'query'     : OPSTATUS_VIEW,
                       'size'      : 'multiple',
                       'printfn'   :  analyze_opstatus,
                       'db'        : 'master',
                       },                   
-    'dbconnection'   : { 'help'      : 'Databse connection stat (Daily)',
+    'dbconnection'   : { 'help'      : 'Database connection stat (Daily)',
                       'query'     : DBCONNECTION_VIEW,
                       'size'      : 'multiple',
                       'printfn'   :  analyze_conection,
                       'db'        : 'master',
                       'frequency' : '5min'
                       },                   
-    'eventlog'       : { 'help'      : 'Event_log',
+    'eventlog'       : { 'help'      : 'Event log',
                       'query'     : EVENTLOG_VIEW,
                       'size'      : 'multiple',
                       'printfn'   :  analyze_eventlog,
