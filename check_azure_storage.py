@@ -386,7 +386,7 @@ def check_storagetx_errors(table_service, storage_type, key, warning,
     except exceptions.KeyError, error:
         error_code = 3
         errors.append('Specified key was not found.')
-    return error_code, '; '.join(errors)
+    return error_code_all, '; '.join(errors)
 
 
 def check_storage_errors_all(management, storage_type, subtype, key, warning, 
