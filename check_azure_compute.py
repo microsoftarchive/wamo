@@ -71,6 +71,8 @@ def check_for_errors(management, hostname):
     if not service.deployments:
         errors.append('No deployments found')
     for deployment in service.deployments:
+        if deployment.deployment_slot != 'Production':
+            continue # do not care about stopped staging deployments
         if deployment.status != 'Running':
             errors.append('Deployment status: {0}'.format(deployment.status))
         if not deployment.role_instance_list:
